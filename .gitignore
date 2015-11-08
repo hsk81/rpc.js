@@ -1,4 +1,7 @@
-cpy3
-ppy3
-src/node_modules
 .idea
+
+client/js/node_modules
+server/py/cpy3
+server/py/ppy3
+server/py/dist
+server/py/*.egg-info

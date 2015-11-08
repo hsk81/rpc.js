@@ -1,18 +1,18 @@
 {
   "author": "Hasan Karahan",
-  "bin": {"ws-client": "./bin/ws-client"},
+  "bin": {"rpc-client": "./bin/rpc-client"},
   "dependencies": {
     "argparse": ">=1.0.3",
     "moment": ">=2.10.6",
     "sprintf-js": ">=1.0.3",
     "ws": ">=0.8.0"
   },
-  "description": "Measures RTT of a WebSocket connection",
+  "description": "RPC client",
   "engines": {"node": "*"},
-  "keywords": ["websocket", "client", "rtt"],
+  "keywords": ["rpc", "client"],
   "license": "MIT",
-  "main": "./lib/ws-client",
-  "name": "ws-client",
+  "main": "./lib/rpc-client",
+  "name": "rpc-client",
   "repository": {"url": ""},
   "version": "0.0.1"
 }
