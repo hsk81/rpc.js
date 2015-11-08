@@ -19,6 +19,9 @@ parser.addArgument(['port'], {
 parser.addArgument(['host'], {
     nargs: '?', help: 'Server Host', defaultValue: 'localhost'
 });
+parser.addArgument(['tpl'], {
+    nargs: '?', help: 'Output Template', defaultValue: '{diff}'
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -37,22 +40,22 @@ var ws = new WebSocket('ws://{host}:{port}'
 ws.onmessage = function (ev) {
 
     var next = moment(),
-        diff = next.diff(GLOBAL.last || moment());
+        diff = next.diff(GLOBAL.last || moment(), true);
 
     GLOBAL.last = next;
 
-    var p1 = sprintf('%03f', diff),
-        p2 = '[' + next.toISOString() + ']',
-        p3 = ev.data;
-
-    console.log(p1, p2, p3);
+    console.log(args.tpl
+        .replace('{last}', last.toISOString())
+        .replace('{diff}', sprintf('%03f', diff))
+        .replace('{next}', next.toISOString())
+        .replace('{data}', ev.data));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onopen = function () {
     var id = setInterval(function () { ws.send('.')}, 0);
-    setTimeout(function () { clearInterval(id); }, 10000);
+    setTimeout(function () { clearInterval(id); ws.close(); }, 10000);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

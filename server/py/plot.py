@@ -5,14 +5,30 @@ import argparse, os, sys
 
 from datetime import datetime
 from matplotlib import pyplot
+from matplotlib import pylab
 
 ###############################################################################
 ###############################################################################
 
 def histogram(arguments):
 
-    data = map(float, sys.stdin.readlines())
+    data = pylab.array(list(map(float, sys.stdin.readlines())))
+    data_min = min(data)
+    data_avg = pylab.average(data)
+    data_max = max(data)
+    data_std = pylab.std(data)
+
     pyplot.hist(list(data), bins=arguments.bins)
+    pyplot.title(arguments.suptitle)
+
+    if arguments.title is None:
+        pyplot.title('min|avg|max|std = {0:0.2f}|{1:0.2f}|{2:0.2f}|{3:0.2f}'
+            .format(data_min, data_avg, data_max, data_std))
+    else:
+        pyplot.title(arguments.title)
+
+    pyplot.xlabel(arguments.xlabel)
+    pyplot.ylabel(arguments.ylabel)
     pyplot.grid()
 
     pyplot.savefig(path(arguments))
@@ -34,6 +50,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='Plotter',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers()
+
+    parser.add_argument('--title', type=str,
+        default=os.environ.get('PLOT_TITLE', None),
+        help='Plot title')
+    parser.add_argument('--suptitle', type=str,
+        default=os.environ.get('PLOT_SUPTITLE', None),
+        help='Plot sup-title')
+    parser.add_argument('--xlabel', type=str,
+        default=os.environ.get('PLOT_XLABEL', 'Bins'),
+        help='Plot x-label')
+    parser.add_argument('--ylabel', type=str,
+        default=os.environ.get('PLOT_YLABEL', 'Frequencey'),
+        help='Plot y-label')
 
     parser.add_argument('--image-tpl', type=str,
         default=os.environ.get('PLOT_IMAGE_TPL', 'img-[{0}].{1}'),
