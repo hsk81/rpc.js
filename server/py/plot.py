@@ -12,11 +12,14 @@ from matplotlib import pylab
 
 def histogram(arguments):
 
-    data = pylab.array(list(map(float, sys.stdin.readlines())))
+    data = list(map(float, sys.stdin.readlines()))
     data_min = min(data)
-    data_avg = pylab.average(data)
+    data_avg = pylab.average(pylab.array(data))
     data_max = max(data)
-    data_std = pylab.std(data)
+    data_std = pylab.std(pylab.array(data))
+
+    data = filter(
+        lambda n: data_avg + arguments.n * data_std > (n**2)**0.5, data)
 
     pyplot.hist(list(data), bins=arguments.bins)
     pyplot.title(arguments.suptitle)
@@ -63,6 +66,10 @@ if __name__ == "__main__":
     parser.add_argument('--ylabel', type=str,
         default=os.environ.get('PLOT_YLABEL', 'Frequencey'),
         help='Plot y-label')
+
+    parser.add_argument('-n', type=float,
+        default=os.environ.get('PLOT_N', 5.0),
+        help='Plot standard deviation cap')
 
     parser.add_argument('--image-tpl', type=str,
         default=os.environ.get('PLOT_IMAGE_TPL', 'img-[{0}].{1}'),
