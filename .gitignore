@@ -1,7 +1,9 @@
 .idea
 
 client/js/node_modules
+
+server/py/build
+server/py/dist
 server/py/cpy3
 server/py/ppy3
-server/py/dist
 server/py/*.egg-info
