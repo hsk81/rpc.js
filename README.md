@@ -12,7 +12,7 @@ A research onto the behaviour of a lightweight RPC approach for JavaScript: The
 system is made of two components - a client and a server - with the following
 setup:
 
-    [client: node.js] <=> [protocol: web-sockets] <=> [server: python]
+    [client: node.js] <=> [protocol-buffers+web-sockets] <=> [server: python]
 
 ## Client: Node.js with ws
 
@@ -70,7 +70,7 @@ captured into a file:
 
 Then a corresponding histogram can be generated with:
 
-    cat log/statistics.og | ./server/py/plot.py histogram
+    cat log/statistics.log | ./server/py/plot.py histogram
 
 For the latter to work you need the [matplotlib] to be available with your
 [Python] installation: An image with a name like `img-[...].png` should be
@@ -79,9 +79,9 @@ generated.
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 image like:
 
-![RTT in milli-seconds](log/img-[2015-11-09T15:07:44.457Z].png)
+![RTT in milli-seconds](log/img-[2015-11-09T15:51:38.764Z].png)
 
-As you see the average RTT is about 1.14ms with a standard deviation of 0.84ms.
+As you see the average RTT is about 1.31ms with a standard deviation of 0.90ms.
 
 To gauge the robustness of the system depending on various parts of the test,
 another server with CPython and [PyPy] (both with [Tornado]) has been tested,

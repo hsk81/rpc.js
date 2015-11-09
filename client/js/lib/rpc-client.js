@@ -2,7 +2,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var ArgumentParser = require('argparse').ArgumentParser,
+    assert = require('assert'),
     moment = require('moment'),
+    ProtoBuf = require("protobufjs"),
     WebSocket = require('ws');
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,11 +28,23 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+var Core = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../protocol', file: 'core.proto'
+});
+
+var RpcMessage = Core.build('RpcMessage');
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 var ws = new WebSocket('ws://' + args.host + ':' + args.port);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ws.onmessage = function () {
+ws.onmessage = function (ev) {
+    var rpc_message = RpcMessage.decode(ev.data);
+    assert.equal(rpc_message.value, '.');
+
     var next = moment(), diff = next.diff(GLOBAL.last || moment(), true);
     GLOBAL.last = next;
     console.log(diff);
@@ -40,7 +54,10 @@ ws.onmessage = function () {
 
 ws.onopen = function () {
     var id = setInterval(function () {
-        ws.send('.');
+        var rpc_message = new RpcMessage({value: '.'}),
+            buffer = rpc_message.encode();
+
+        ws.send(buffer.toBuffer());
     }, 0);
 
     setTimeout(function () {

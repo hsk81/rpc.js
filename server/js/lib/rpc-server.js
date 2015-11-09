@@ -2,14 +2,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var ArgumentParser = require('argparse').ArgumentParser,
-    moment = require('moment'),
+    assert = require('assert'),
+    ProtoBuf = require("protobufjs"),
     WebSocket = require('ws');
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 var parser = new ArgumentParser({
-  addHelp: true, description: 'RPC Server', version: '0.0.1'
+    addHelp: true, description: 'RPC Server', version: '0.0.1'
 });
 
 parser.addArgument(['port'], {
@@ -26,6 +27,15 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+var Core = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../protocol', file: 'core.proto'
+});
+
+var RpcMessage = Core.build('RpcMessage');
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 var WebSocketServer = require('ws').Server;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,9 +45,13 @@ var wss = new WebSocketServer({
 });
 
 wss.on('connection', function (ws) {
-  ws.on('message', function (message) {
-      ws.send(message);
-  });
+    ws.on('message', function (data) {
+        var rpc_message = RpcMessage.decode(data);
+        assert.equal(rpc_message.value, '.');
+
+        var buffer = rpc_message.encode();
+        ws.send(buffer.toBuffer());
+    });
 });
 
 ///////////////////////////////////////////////////////////////////////////////
