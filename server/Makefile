@@ -1,4 +1,4 @@
-.PHONY: run-py run-py.cpy run-py.ppy
+.PHONY: run-py run-py.env run-py.ppy
 .PHONY: clean-py
 
 ###############################################################################
@@ -8,16 +8,11 @@ build: \
 	build-js build-py
 build-js:
 	cd js && npm install
-build-py: \
-	build-py.cpy build-py.ppy
-build-py.cpy: build-py.pb
-	cd py && rm cpy -rf && mkdir -p cpy
-	cd py && virtualenv2 -p /usr/bin/python2 --prompt="[cpy] " cpy/
-	cd py && cpy/bin/python setup.py install
-build-py.ppy: build-py.pb
-	cd py && rm ppy -rf && mkdir -p ppy
-	cd py && virtualenv2 -p /usr/bin/pypy --prompt="[ppy] " ppy/
-	cd py && ppy/bin/python setup.py install
+build-py: build-py.pb
+	cd py && rm env -rf && mkdir -p env
+	cd py && virtualenv2 \
+	-p /usr/bin/python2 --system-site-packages --prompt="[env] " env/
+	cd py && env/bin/python setup.py install
 build-py.pb:
 	cd py && protoc --python_out=./ protocol/*.proto
 
@@ -29,11 +24,7 @@ run:\
 run-js:
 	cd js && ./bin/rpc-server $(filter-out $@,$(MAKECMDGOALS))
 run-py:
-	py/cpy/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
-run-py.cpy:
-	py/cpy/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
-run-py.ppy:
-	py/ppy/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
+	py/env/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
 
 ###############################################################################
 ###############################################################################
@@ -43,10 +34,11 @@ clean: \
 clean-js:
 	rm js/node_modules -rf
 clean-py:
-	rm py/{build,dist} -rf
-	rm py/{cpy,ppy} -rf
+	rm py/{build,dist,env} -rf
 	rm py/*.egg-info -rf
-	rm py/protocol/*.py -f
+	rm py/protocol/*_pb2.py -f
+	rm py/protocol/*_pb3.py -f
+
 
 ###############################################################################
 ###############################################################################

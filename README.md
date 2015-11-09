@@ -84,5 +84,5 @@ image like:
 As you see the average RTT is about 1.31ms with a standard deviation of 0.91ms.
 
 To gauge the robustness of the system depending on various parts of the test,
-another server with CPython and [PyPy] (both with [Tornado]) has been tested,
-where these alternative implementation have produced similar results.
+another server with CPython with the [Tornado] web framework has been tested,
+where this alternative implementation has produced similar results.
