@@ -5,7 +5,9 @@
 ###############################################################################
 
 build: \
-	build-py
+	build-js build-py
+build-js:
+	cd js && npm install
 build-py: \
 	build-py.cpy build-py.ppy
 build-py.cpy: build-py.pb
@@ -22,8 +24,10 @@ build-py.pb:
 ###############################################################################
 ###############################################################################
 
-run:
-	py/cpy/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
+run:\
+	run-js
+run-js:
+	cd js && ./bin/rpc-server $(filter-out $@,$(MAKECMDGOALS))
 run-py:
 	py/cpy/bin/python py/server.py $(filter-out $@,$(MAKECMDGOALS))
 run-py.cpy:
@@ -35,7 +39,9 @@ run-py.ppy:
 ###############################################################################
 
 clean: \
-	clean-py
+	clean-js clean-py
+clean-js:
+	rm js/node_modules -rf
 clean-py:
 	rm py/{build,dist} -rf
 	rm py/{cpy,ppy} -rf

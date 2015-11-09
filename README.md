@@ -5,7 +5,6 @@
 [WebSockets]: http://www.html5rocks.com/en/tutorials/websockets/basics/
 [Python]: https://www.python.org/
 [Tornado]: http://www.tornadoweb.org/en/stable/
-
 [matplotlib]: http://matplotlib.org/
 [PyPy]: http://pypy.org/
 
@@ -36,11 +35,11 @@ port `8088`.
 Using this example, the client-server system ends up being an experiment to
 measure the performance capacity of WebSockets on a local system.
 
-## Server: Python with Tornado
+## Server: Node.js with ws
 
 Upon receiving a message the server reflects it immediately back as it is,
-without any further processing. It has been implemented using [Python] with
-[Tornado] - a web framework and asynchronous networking library.
+without any further processing. It has been implemented using [Node.js] with
+again [ws].
 
 ## Building the client/server
 
@@ -48,7 +47,7 @@ To build the server execute:
 
     make build-server
 
-And to build the client run:
+And to build the client execute:
 
     make build-client
 
@@ -56,33 +55,34 @@ And to build the client run:
 
 To run the server execute:
 
-    make run-server py
+    make run-server js
 
 To run the client execute:
 
-    make run-client py
+    make run-client js
 
 ## Performance
 
 To analyse the time measurements done by client the console output needs to be
 captured into a file:
 
-    make run-client py | grep ^0 > log/statistics.log
+    make run-client js | grep ^[0-9] > log/statistics.log
 
 Then a corresponding histogram can be generated with:
 
-    cat log/statistics | ./server/py/plot.py histogram
+    cat log/statistics.og | ./server/py/plot.py histogram
 
 For the latter to work you need the [matplotlib] to be available with your
-Python 3 installation: An image like `img-[0000-00-00T00:00:00.000Z].png` should
-be generated.
+[Python] installation: An image with a name like `img-[...].png` should be
+generated.
 
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 image like:
 
-![RTT in milli-seconds](log/img-[2015-11-09T10:41:10.658Z].png)
+![RTT in milli-seconds](log/img-[2015-11-09T15:07:44.457Z].png)
 
-As you see the average RTT is about 1.33ms with a standard deviation of 0.65ms.
+As you see the average RTT is about 1.14ms with a standard deviation of 0.84ms.
+
 To gauge the robustness of the system depending on various parts of the test,
-the server has been run using a standard CPython version 3.5 implementation,
-but it has also be run using [PyPy] 2.4, which produced similar results.
+another server with CPython and [PyPy] (both with [Tornado]) has been tested,
+where these alternative implementation have produced similar results.
