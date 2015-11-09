@@ -70,7 +70,7 @@ captured into a file:
 
 Then a corresponding histogram can be generated with:
 
-    cat log/statistics.og | ./server/py/plot.py histogram
+    cat log/statistics.log | ./server/py/plot.py histogram
 
 For the latter to work you need the [matplotlib] to be available with your
 [Python] installation: An image with a name like `img-[...].png` should be
