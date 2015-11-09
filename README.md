@@ -81,7 +81,7 @@ image like:
 
 ![RTT in milli-seconds](log/img-[2015-11-09T15:51:38.764Z].png)
 
-As you see the average RTT is about 1.31ms with a standard deviation of 0.90ms.
+As you see the average RTT is about 1.31ms with a standard deviation of 0.91ms.
 
 To gauge the robustness of the system depending on various parts of the test,
 another server with CPython and [PyPy] (both with [Tornado]) has been tested,
