@@ -9,13 +9,23 @@ import tornado.ioloop
 ###############################################################################
 ###############################################################################
 
+from protocol import core_pb2 as Core
+
+###############################################################################
+###############################################################################
+
 class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
     def open (self):
-        self.write_message("You are connected")
+        pass
 
-    def on_message (self, message):
-        self.write_message(message)
+    def on_message (self, data):
+        rpc_message = Core.RpcMessage()
+        rpc_message.ParseFromString(data)
+        assert rpc_message.value == '.'
+
+        buffer = rpc_message.SerializeToString()
+        self.write_message(buffer, binary=True)
 
     def on_close (self):
         pass
