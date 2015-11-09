@@ -22,7 +22,7 @@ def histogram(arguments):
         lambda n: data_avg + arguments.n * data_std > (n**2)**0.5, data)
 
     pyplot.hist(list(data), bins=arguments.bins)
-    pyplot.title(arguments.suptitle)
+    pyplot.suptitle(arguments.suptitle)
 
     if arguments.title is None:
         pyplot.title('min|avg|max|std = {0:0.2f}|{1:0.2f}|{2:0.2f}|{3:0.2f}'
