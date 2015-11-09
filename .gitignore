@@ -1,9 +1,13 @@
 .idea
 
 client/js/node_modules
+server/js/node_modules
+
+protocol/*_pb2.py
+protocol/*_pb3.py
 
 server/py/build
 server/py/dist
-server/py/cpy3
-server/py/ppy3
+server/py/cpy
+server/py/ppy
 server/py/*.egg-info

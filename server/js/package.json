@@ -1,17 +1,17 @@
 {
   "author": "Hasan Karahan",
-  "bin": {"rpc-client": "./bin/rpc-client"},
+  "bin": {"rpc-client": "./bin/rpc-server"},
   "dependencies": {
     "argparse": ">=1.0.3",
     "moment": ">=2.10.6",
     "ws": ">=0.8.0"
   },
-  "description": "RPC Client",
+  "description": "RPC Server",
   "engines": {"node": "*"},
-  "keywords": ["rpc", "client"],
+  "keywords": ["rpc", "server"],
   "license": "MIT",
-  "main": "./lib/rpc-client",
-  "name": "rpc-client",
+  "main": "./lib/rpc-server",
+  "name": "rpc-server",
   "repository": {"url": ""},
   "version": "0.0.1"
 }

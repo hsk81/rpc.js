@@ -9,7 +9,7 @@ var ArgumentParser = require('argparse').ArgumentParser,
 ///////////////////////////////////////////////////////////////////////////////
 
 var parser = new ArgumentParser({
-  addHelp: true, description: 'RPC Client', version: '0.0.1'
+  addHelp: true, description: 'RPC Server', version: '0.0.1'
 });
 
 parser.addArgument(['port'], {
@@ -26,28 +26,19 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-var ws = new WebSocket('ws://' + args.host + ':' + args.port);
+var WebSocketServer = require('ws').Server;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ws.onmessage = function () {
-    var next = moment(), diff = next.diff(GLOBAL.last || moment(), true);
-    GLOBAL.last = next;
-    console.log(diff);
-};
+var wss = new WebSocketServer({
+    host: args.host, port: args.port
+});
 
-///////////////////////////////////////////////////////////////////////////////
-
-ws.onopen = function () {
-    var id = setInterval(function () {
-        ws.send('.');
-    }, 0);
-
-    setTimeout(function () {
-        clearInterval(id);
-        ws.close();
-    }, 10000);
-};
+wss.on('connection', function (ws) {
+  ws.on('message', function (message) {
+      ws.send(message);
+  });
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
