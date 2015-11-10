@@ -8,6 +8,5 @@ protocol/*_pb3.py
 
 server/py/build
 server/py/dist
-server/py/cpy
-server/py/ppy
+server/py/env
 server/py/*.egg-info

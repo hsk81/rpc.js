@@ -11,23 +11,15 @@ import tornado.ioloop
 
 class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
-    def open (self):
-        self.write_message("You are connected")
-
     def on_message (self, message):
-        self.write_message(message)
-
-    def on_close (self):
-        pass
+        self.write_message(message, binary=True)
 
     def check_origin (self, origin):
         return True
 
 ###############################################################################
 
-application = tornado.web.Application ([
-    (r'/', WsEchoHandler),
-])
+application = tornado.web.Application ([(r'/', WsEchoHandler)])
 
 ###############################################################################
 ###############################################################################

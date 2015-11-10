@@ -3,7 +3,6 @@
   "bin": {"rpc-client": "./bin/rpc-server"},
   "dependencies": {
     "argparse": ">=1.0.3",
-    "moment": ">=2.10.6",
     "ws": ">=0.8.0"
   },
   "description": "RPC Server",

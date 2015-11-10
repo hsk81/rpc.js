@@ -1,45 +1,41 @@
 # RPC.js - An RPC solution for JavaScript
 
+[ByteBuffer]: https://github.com/dcodeIO/bytebuffer.js/
+[matplotlib]: http://matplotlib.org/
 [Node.js]: http://nodejs.org/
-[ws]: https://www.npmjs.com/package/ws
-[WebSockets]: http://www.html5rocks.com/en/tutorials/websockets/basics/
 [Python]: https://www.python.org/
 [Tornado]: http://www.tornadoweb.org/en/stable/
-[matplotlib]: http://matplotlib.org/
-[PyPy]: http://pypy.org/
+[ws]: https://www.npmjs.com/package/ws
+[WebSockets]: http://www.html5rocks.com/en/tutorials/websockets/basics/
 
 A research onto the behaviour of a lightweight RPC approach for JavaScript: The
 system is made of two components - a client and a server - with the following
 setup:
 
-    [client: node.js] <=> [protocol: web-sockets] <=> [server: python]
+    [client: node.js] <=> [protocol: web-sockets] <=> [server: node.js]
 
 ## Client: Node.js with ws
 
 The client is an implementation in [Node.js] using the fast [ws] library for
-[WebSockets]: It sends a short message (a single dot character) to the server.
-Since the server reflects the message, the same message is immediately received
-back:
+[WebSockets]: It sends a short message (a timestamp) to the server. Since the 
+latter reflects the message, it is immediately received back:
 
-    [client: message] => [server: echo] => [client: same message]
+    [client: timestamp] => [server: echo] => [client: timestamp]
 
 The durations between each reception of a message is measured with a resolution
-of milli-seconds, and they are then reported continuously on the console.
+of sub milli-seconds, and they are then reported continuously on the console.
  
 ## Protocol: WebSockets 
 
-The [WebSockets] protocol is used for communication, where the client connects
-to e.g. `ws://localhost:8088` and where the server listens accordingly on the
-port `8088`.
-
-Using this example, the client-server system ends up being an experiment to
-measure the performance capacity of WebSockets on a local system.
+The binary [WebSockets] protocol is used for communication, where the client
+connects to e.g. `ws://localhost:8088` and where the server listens accordingly
+on the port `8088`.
 
 ## Server: Node.js with ws
 
 Upon receiving a message the server reflects it immediately back as it is,
-without any further processing. It has been implemented using [Node.js] with
-again [ws].
+without any further processing. It has also been implemented in [Node.js] with
+again the [ws] library.
 
 ## Building the client/server
 
@@ -66,23 +62,25 @@ To run the client execute:
 To analyse the time measurements done by client the console output needs to be
 captured into a file:
 
-    make run-client js | grep ^[0-9] > log/statistics.log
+    make run-client js | grep ^[0-9] > log/time-series.log
 
 Then a corresponding histogram can be generated with:
 
-    cat log/statistics.log | ./server/py/plot.py histogram
+    cat log/time-series.log | ./server/py/plot.py histogram
 
 For the latter to work you need the [matplotlib] to be available with your
 [Python] installation: An image with a name like `img-[...].png` should be
 generated.
 
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
-image like:
+result like:
 
-![RTT in milli-seconds](log/img-[2015-11-09T15:07:44.457Z].png)
+![RTT in milli-seconds](log/img-[2015-11-10T16:21:25.836Z].png)
 
-As you see the average RTT is about 1.14ms with a standard deviation of 0.84ms.
+As you see the average RTT is about 0.63ms with a standard deviation of 0.99ms;
+this has partly been achieved by packing the timestamp (a *float64* number) as
+a buffer of bytes (using the [ByteBuffer] library).
 
-To gauge the robustness of the system depending on various parts of the test,
-another server with CPython and [PyPy] (both with [Tornado]) has been tested,
-where these alternative implementation have produced similar results.
+To gauge the robustness of the system, another server with CPython using the
+[Tornado] has been tested, where these alternative implementation has produced
+similar (but slightly slower) result.

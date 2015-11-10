@@ -2,7 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var ArgumentParser = require('argparse').ArgumentParser,
-    moment = require('moment'),
+    ByteBuffer = require('bytebuffer'),
+    now = require('performance-now'),
     WebSocket = require('ws');
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,17 +31,20 @@ var ws = new WebSocket('ws://' + args.host + ':' + args.port);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ws.onmessage = function () {
-    var next = moment(), diff = next.diff(GLOBAL.last || moment(), true);
-    GLOBAL.last = next;
-    console.log(diff);
+ws.onmessage = function (ev) {
+    var bb = ByteBuffer.fromBinary(ev.data);
+    console.log(now() - bb.readFloat64());
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onopen = function () {
+    var bb = new ByteBuffer();
     var id = setInterval(function () {
-        ws.send('.');
+        bb.flip().writeFloat64(now());
+        ws.send(bb.flip().toBuffer(), {
+            binary: true
+        });
     }, 0);
 
     setTimeout(function () {
