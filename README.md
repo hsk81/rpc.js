@@ -84,9 +84,9 @@ generated.
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 result like:
 
-![RTT in milli-seconds](log/img-[2015-11-10T20:42:25.148Z].png)
+![RTT in milli-seconds](log/img-[2015-11-10T21:06:59.976Z].png)
 
-As you see the average RTT is about 0.89ms with a standard deviation of 0.54ms.
+As you see the average RTT is about 0.79ms with a standard deviation of 0.44ms.
 
 To gauge the robustness of the system, another server with CPython using the
 [Tornado] has been tested, where these alternative implementation has produced

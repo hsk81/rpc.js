@@ -41,17 +41,17 @@ var ws = new WebSocket('ws://' + args.host + ':' + args.port);
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onmessage = function (ev) {
-    var ts = new Core.Timestamp.decode(ev.data);
+    var ts = JSON.parse(ev.data);
     console.log(now() - ts.value);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onopen = function () {
-    var ts = new Core.Timestamp();
+    var ts;
     var id = setInterval(function () {
-        ts.value = now();
-        ws.send(ts.toBuffer(), {
+        ts = JSON.stringify({value: now()});
+        ws.send(ts, {
             binary: true
         });
     }, 0);

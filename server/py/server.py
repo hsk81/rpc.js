@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 
-import argparse, os
+import argparse, os, json
 import tornado.web
 import tornado.websocket
 import tornado.ioloop
@@ -17,10 +17,10 @@ from protocol import core_pb2 as Core
 class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
     def on_message (self, data):
-        ts = Core.Timestamp(); ts.ParseFromString(data)
-        assert type (ts.value) == float
+        ts = json.loads(data)
+        assert type (ts['value']) == float
 
-        self.write_message(ts.SerializeToString(), binary=True)
+        self.write_message(json.dumps(ts), binary=True)
 
     def check_origin (self, origin):
         return True

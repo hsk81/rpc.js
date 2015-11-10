@@ -42,10 +42,10 @@ var wss = new WebSocket.Server({
 
 wss.on('connection', function (ws) {
   ws.on('message', function (data) {
-      var ts = new Core.Timestamp.decode(data);
+      var ts = JSON.parse(data);
       assert.ok(typeof ts.value, 'number');
 
-      ws.send(ts.toBuffer(), {binary: true});
+      ws.send(JSON.stringify(ts), {binary: true});
   });
 });
 
