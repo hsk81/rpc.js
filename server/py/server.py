@@ -9,10 +9,18 @@ import tornado.ioloop
 ###############################################################################
 ###############################################################################
 
+from protocol import core_pb2 as Core
+
+###############################################################################
+###############################################################################
+
 class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
-    def on_message (self, message):
-        self.write_message(message, binary=True)
+    def on_message (self, data):
+        ts = Core.Timestamp(); ts.ParseFromString(data)
+     ## assert type (ts.value) == float
+
+        self.write_message(ts.SerializeToString(), binary=True)
 
     def check_origin (self, origin):
         return True

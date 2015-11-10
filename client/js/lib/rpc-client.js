@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var ArgumentParser = require('argparse').ArgumentParser,
-    ByteBuffer = require('bytebuffer'),
+    ProtoBuf = require('protobufjs'),
     now = require('performance-now'),
     WebSocket = require('ws');
 
@@ -27,22 +27,31 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+var CoreFactory = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../../../protocol', file: 'core.proto'
+});
+
+var Core = CoreFactory.build();
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 var ws = new WebSocket('ws://' + args.host + ':' + args.port);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onmessage = function (ev) {
-    var bb = ByteBuffer.fromBinary(ev.data);
-    console.log(now() - bb.readFloat64());
+    var ts = new Core.Timestamp.decode(ev.data);
+    console.log(now() - ts.value);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ws.onopen = function () {
-    var bb = new ByteBuffer();
+    var ts = new Core.Timestamp();
     var id = setInterval(function () {
-        bb.flip().writeFloat64(now());
-        ws.send(bb.flip().toBuffer(), {
+        ts.value = now();
+        ws.send(ts.toBuffer(), {
             binary: true
         });
     }, 0);

@@ -3,7 +3,7 @@
   "bin": {"rpc-client": "./bin/rpc-client"},
   "dependencies": {
     "argparse": ">=1.0.3",
-    "bytebuffer": ">=5.0.0",
+    "protobufjs": ">=4.1.2",
     "performance-now": ">=0.2.0",
     "ws": ">=0.8.0"
   },

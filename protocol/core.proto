@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message Timestamp {
+    double value = 1;
+}

@@ -3,6 +3,7 @@
 [ByteBuffer]: https://github.com/dcodeIO/bytebuffer.js/
 [matplotlib]: http://matplotlib.org/
 [Node.js]: http://nodejs.org/
+[Protocol Buffers]: https://developers.google.com/protocol-buffers/
 [Python]: https://www.python.org/
 [Tornado]: http://www.tornadoweb.org/en/stable/
 [ws]: https://www.npmjs.com/package/ws
@@ -12,7 +13,7 @@ A research onto the behaviour of a lightweight RPC approach for JavaScript: The
 system is made of two components - a client and a server - with the following
 setup:
 
-    [client: node.js] <=> [protocol: web-sockets] <=> [server: node.js]
+    [client: node.js] <=> [protocol: web-sockets+pb] <=> [server: node.js]
 
 ## Client: Node.js with ws
 
@@ -25,11 +26,19 @@ latter reflects the message, it is immediately received back:
 The durations between each reception of a message is measured with a resolution
 of sub milli-seconds, and they are then reported continuously on the console.
  
-## Protocol: WebSockets 
+## Protocol: WebSockets + Protocol Buffers
 
 The binary [WebSockets] protocol is used for communication, where the client
 connects to e.g. `ws://localhost:8088` and where the server listens accordingly
 on the port `8088`.
+
+Each timestamp value is packed within a *Timestamp* message using Google's
+[Protocol Buffers] anguage-neutral and platform-neutral extensible mechanism for 
+serializing structured data:
+
+    message Timestamp {
+        double value = 1;
+    }
 
 ## Server: Node.js with ws
 
@@ -75,11 +84,9 @@ generated.
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 result like:
 
-![RTT in milli-seconds](log/img-[2015-11-10T16:21:25.836Z].png)
+![RTT in milli-seconds](log/img-[2015-11-10T18:14:25.834Z].png)
 
-As you see the average RTT is about 0.63ms with a standard deviation of 0.99ms;
-this has partly been achieved by packing the timestamp (a *float64* number) as
-a buffer of bytes (using the [ByteBuffer] library).
+As you see the average RTT is about 0.82ms with a standard deviation of 2.35ms.
 
 To gauge the robustness of the system, another server with CPython using the
 [Tornado] has been tested, where these alternative implementation has produced

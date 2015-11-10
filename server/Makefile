@@ -8,10 +8,12 @@ build: \
 	build-js build-py
 build-js:
 	cd js && npm install
-build-py:
+build-py: build-py.pb
 	cd py && rm env -rf && mkdir -p env
-	cd py && virtualenv2 -p /usr/bin/python2 --prompt="[env] " env/
+	cd py && virtualenv2 -p /usr/bin/python2 --system-site-packages env/
 	cd py && env/bin/python setup.py install
+build-py.pb:
+	cd py && protoc --python_out=./ protocol/*.proto
 
 ###############################################################################
 ###############################################################################
@@ -33,7 +35,8 @@ clean-js:
 clean-py:
 	rm py/{build,dist,env} -rf
 	rm py/*.egg-info -rf
-	rm py/protocol/*.py -f
+	rm py/protocol/*_pb2.py -f
+	rm py/protocol/*_pb3.py -f
 
 ###############################################################################
 ###############################################################################

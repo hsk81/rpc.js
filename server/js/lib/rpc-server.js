@@ -2,6 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var ArgumentParser = require('argparse').ArgumentParser,
+    assert = require('assert'),
+    ProtoBuf = require('protobufjs'),
     WebSocket = require('ws');
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,13 +27,25 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+var CoreFactory = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../../../protocol', file: 'core.proto'
+});
+
+var Core = CoreFactory.build();
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 var wss = new WebSocket.Server({
     host: args.host, port: args.port
 });
 
 wss.on('connection', function (ws) {
   ws.on('message', function (data) {
-      ws.send(data, {binary: true});
+      var ts = new Core.Timestamp.decode(data);
+   // assert.ok(typeof ts.value, 'number');
+
+      ws.send(ts.toBuffer(), {binary: true});
   });
 });
 
