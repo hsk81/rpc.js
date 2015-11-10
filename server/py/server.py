@@ -11,8 +11,8 @@ import tornado.ioloop
 
 class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
-    def on_message (self, message):
-        self.write_message(message, binary=True)
+    def on_message (self, data):
+        self.write_message(data, binary=True)
 
     def check_origin (self, origin):
         return True
