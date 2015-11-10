@@ -75,9 +75,9 @@ generated.
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 result like:
 
-![RTT in milli-seconds](log/img-[2015-11-10T18:31:02.993Z].png)
+![RTT in milli-seconds](log/img-[2015-11-10T20:36:29.323Z].png)
 
-As you see the average RTT is about 0.63ms with a standard deviation of 0.99ms;
+As you see the average RTT is about 0.73ms with a standard deviation of 0.58ms;
 this has partly been achieved by packing the timestamp (a *float64* number) as
 a buffer of bytes (using the [ByteBuffer] library).
 
