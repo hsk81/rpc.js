@@ -18,7 +18,7 @@ class WsEchoHandler (tornado.websocket.WebSocketHandler):
 
     def on_message (self, data):
         ts = Core.Timestamp(); ts.ParseFromString(data)
-     ## assert type (ts.value) == float
+        assert type (ts.value) == float
 
         self.write_message(ts.SerializeToString(), binary=True)
 
