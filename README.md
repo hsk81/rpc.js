@@ -79,9 +79,9 @@ generated.
 On a GNU/Linux system with a Intel Pentium CORE i5 processor you should get an
 image like:
 
-![RTT in milli-seconds](log/img-[2015-11-09T15:51:38.764Z].png)
+![RTT in milli-seconds](log/img-[2015-11-10T13:26:09.743Z].png)
 
-As you see the average RTT is about 1.31ms with a standard deviation of 0.91ms.
+As you see the average RTT is about 1.18ms with a standard deviation of 0.86ms.
 
 To gauge the robustness of the system depending on various parts of the test,
 another server with CPython with the [Tornado] web framework has been tested,
