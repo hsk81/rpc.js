@@ -10,7 +10,7 @@ var ArgumentParser = require('argparse').ArgumentParser,
 ///////////////////////////////////////////////////////////////////////////////
 
 var parser = new ArgumentParser({
-  addHelp: true, description: 'RPC Server', version: '0.0.1'
+    addHelp: true, description: 'RPC Server', version: '0.0.1'
 });
 
 parser.addArgument(['port'], {
@@ -41,12 +41,48 @@ var wss = new WebSocket.Server({
 });
 
 wss.on('connection', function (ws) {
-  ws.on('message', function (data) {
-      var ts = new Core.Timestamp.decode(data);
-      assert.ok(typeof ts.value, 'number');
+    var pair, result;
 
-      ws.send(ts.toBuffer(), {binary: true});
-  });
+    ws.on('message', function (data, opts) {
+        var service_req = Core.Service.Request.decode(data);
+        if (service_req.name === '.Calculator.Service.add') {
+            pair = Core.Calculator.Pair.decode(service_req.data);
+            result = new Core.Calculator.Result({
+                value: pair.lhs + pair.rhs
+            });
+        }
+
+        else if (service_req.name === '.Calculator.Service.sub') {
+            pair = Core.Calculator.Pair.decode(service_req.data);
+            result = new Core.Calculator.Result({
+                value: pair.lhs - pair.rhs
+            });
+        }
+
+        else if (service_req.name === '.Calculator.Service.mul') {
+            pair = Core.Calculator.Pair.decode(service_req.data);
+            result = new Core.Calculator.Result({
+                value: pair.lhs * pair.rhs
+            });
+        }
+
+        else if (service_req.name === '.Calculator.Service.div') {
+            pair = Core.Calculator.Pair.decode(service_req.data);
+            result = new Core.Calculator.Result({
+                value: pair.lhs / pair.rhs
+            });
+        }
+
+        else {
+            throw(new Error(service_req.name + ': not suported'));
+        }
+
+        var service_res = new Core.Service.Response({
+            id: service_req.id, data: result.toBuffer()
+        });
+
+        ws.send(service_res.toBuffer());
+    });
 });
 
 ///////////////////////////////////////////////////////////////////////////////
