@@ -11,7 +11,7 @@ var ArgumentParser = require('argparse').ArgumentParser,
 ///////////////////////////////////////////////////////////////////////////////
 
 var parser = new ArgumentParser({
-  addHelp: true, description: 'RPC Client', version: '0.0.1'
+    addHelp: true, description: 'RPC Client', version: '0.0.1'
 });
 
 parser.addArgument(['port'], {
@@ -37,32 +37,34 @@ var Core = CoreFactory.build();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-var Service = {build: function (entity_cls, result_cls) {
-    var handler = {};
-    return function (socket) {
-        socket.on('message', function (data) {
-            var service_res = Core.Service.Response.decode(data);
-            handler[service_res.id](service_res.data);
-        });
-
-        return new entity_cls(function (method, req, callback) {
-            var service_req = new Core.Service.Request({
-                name: method, id: next(0,(1<<16)*(1<<16)), data: req.toBuffer()
+var Service = {
+    build: function (entity_cls, result_cls) {
+        var handler = {};
+        return function (socket) {
+            socket.on('message', function (data) {
+                var service_res = Core.Service.Response.decode(data);
+                handler[service_res.id](service_res.data);
             });
 
-            handler[service_req.id] = function (data) {
-                callback(null, result_cls.decode(data));
-            };
+            return new entity_cls(function (method, req, callback) {
+                var service_req = new Core.Service.Request({
+                    name: method, id: nextId(), data: req.toBuffer()
+                });
 
-            socket.send(service_req.toBuffer(), function (error) {
-                if (error) {
-                    delete handler[service_req.id];
-                    callback(error, null);
-                }
+                handler[service_req.id] = function (data) {
+                    callback(null, result_cls.decode(data));
+                };
+
+                socket.send(service_req.toBuffer(), function (error) {
+                    if (error) {
+                        delete handler[service_req.id];
+                        callback(error, null);
+                    }
+                });
             });
-        });
-    };
-}};
+        };
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -84,33 +86,18 @@ ws.onopen = function () {
             lhs: next(0, 256), rhs: next(0, 256)
         });
 
-        var add_now = now();
+        var t0 = now();
         calculator.add(pair, function (error, result) {
             if (error !== null) throw error;
             assert.equal(pair.lhs + pair.rhs, result.value);
-            console.log(now() - add_now);
+            console.log(now() - t0);
         });
 
-        var sub_now = now();
+        var t1 = now();
         calculator.sub(pair, function (error, result) {
             if (error !== null) throw error;
             assert.equal(pair.lhs - pair.rhs, result.value);
-            console.log(now() - sub_now);
-        });
-
-        var mul_now = now();
-        calculator.mul(pair, function (error, result) {
-            if (error !== null) throw error;
-            assert.equal(pair.lhs * pair.rhs, result.value);
-            console.log(now() - mul_now);
-        });
-
-        var div_now = now();
-        calculator.div(pair, function (error, result) {
-            if (error !== null) throw error;
-            if (isFinite(result.value) && !isNaN(result.value))
-                assert.ok(Math.abs(pair.lhs / pair.rhs - result.value) < 0.1);
-            console.log(now() - div_now);
+            console.log(now() - t1);
         });
     }, 0);
 
@@ -126,6 +113,11 @@ ws.onopen = function () {
 function next(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+var nextId = function () {
+    GLOBAL.id = ((GLOBAL.id || 0) + 1) % ((1 << 16) * (1 << 16));
+    return GLOBAL.id;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
