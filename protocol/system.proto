@@ -3,7 +3,7 @@ syntax = "proto3";
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-package Calculator;
+package System;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,15 +13,24 @@ message Pair {
     float rhs = 2;
 }
 
-message Result {
+message AddResult {
+    float value = 1;
+}
+message SubResult {
+    float value = 1;
+}
+message MulResult {
+    float value = 1;
+}
+message DivResult {
     float value = 1;
 }
 
 service Service {
-    rpc add(Pair) returns(Result);
-    rpc sub(Pair) returns(Result);
-    rpc mul(Pair) returns(Result);
-    rpc div(Pair) returns(Result);
+    rpc add(Pair) returns(AddResult);
+    rpc sub(Pair) returns(SubResult);
+    rpc mul(Pair) returns(MulResult);
+    rpc div(Pair) returns(DivResult);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

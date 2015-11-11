@@ -45,30 +45,30 @@ wss.on('connection', function (ws) {
 
     ws.on('message', function (data, opts) {
         var service_req = Core.Service.Request.decode(data);
-        if (service_req.name === '.Calculator.Service.add') {
-            pair = Core.Calculator.Pair.decode(service_req.data);
-            result = new Core.Calculator.Result({
+        if (service_req.name === '.System.Service.add') {
+            pair = Core.System.Pair.decode(service_req.data);
+            result = new Core.System.AddResult({
                 value: pair.lhs + pair.rhs
             });
         }
 
-        else if (service_req.name === '.Calculator.Service.sub') {
-            pair = Core.Calculator.Pair.decode(service_req.data);
-            result = new Core.Calculator.Result({
+        else if (service_req.name === '.System.Service.sub') {
+            pair = Core.System.Pair.decode(service_req.data);
+            result = new Core.System.SubResult({
                 value: pair.lhs - pair.rhs
             });
         }
 
-        else if (service_req.name === '.Calculator.Service.mul') {
-            pair = Core.Calculator.Pair.decode(service_req.data);
-            result = new Core.Calculator.Result({
+        else if (service_req.name === '.System.Service.mul') {
+            pair = Core.System.Pair.decode(service_req.data);
+            result = new Core.System.MulResult({
                 value: pair.lhs * pair.rhs
             });
         }
 
-        else if (service_req.name === '.Calculator.Service.div') {
-            pair = Core.Calculator.Pair.decode(service_req.data);
-            result = new Core.Calculator.Result({
+        else if (service_req.name === '.System.Service.div') {
+            pair = Core.System.Pair.decode(service_req.data);
+            result = new Core.System.DivResult({
                 value: pair.lhs / pair.rhs
             });
         }

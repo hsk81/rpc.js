@@ -34,24 +34,24 @@ var url = 'ws://' + args.host + ':' + args.port;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-var calculator = new Service(url, Core.Calculator.Service, {
-    '.Calculator.Service.add': Core.Calculator.Result,
-    '.Calculator.Service.sub': Core.Calculator.Result,
-    '.Calculator.Service.mul': Core.Calculator.Result,
-    '.Calculator.Service.div': Core.Calculator.Result
+var system = new Service(url, Core.System.Service, {
+    '.System.Service.add': Core.System.AddResult,
+    '.System.Service.sub': Core.System.SubResult,
+    '.System.Service.mul': Core.System.MulResult,
+    '.System.Service.div': Core.System.DivResult
 });
 
 /////////////////////////////////////////////////////////////////////)/////////
 ///////////////////////////////////////////////////////////////////////////////
 
-calculator.socket.on('open', function () {
+system.socket.on('open', function () {
     var intervalId = setInterval(function () {
-        var pair = new Core.Calculator.Pair({
+        var pair = new Core.System.Pair({
             lhs: random(0, 256), rhs: random(0, 256)
         });
 
         var t0 = now();
-        calculator.api.add(pair, function (error, result) {
+        system.api.add(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs + pair.rhs, result.value);
@@ -59,7 +59,7 @@ calculator.socket.on('open', function () {
         });
 
         var t1 = now();
-        calculator.api.sub(pair, function (error, result) {
+        system.api.sub(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs - pair.rhs, result.value);
@@ -69,7 +69,7 @@ calculator.socket.on('open', function () {
 
     setTimeout(function () {
         clearInterval(intervalId);
-        calculator.socket.close();
+        system.socket.close();
     }, 10000);
 });
 
