@@ -22,6 +22,19 @@ parser.addArgument(['host'], {
     nargs: '?', help: 'Server Host', defaultValue: 'localhost'
 });
 
+parser.addArgument(['-a', '--n-add'], {
+    nargs: '?', help: 'ADD Workers', defaultValue: 1
+});
+parser.addArgument(['-s', '--n-sub'], {
+    nargs: '?', help: 'SUB Workers', defaultValue: 1
+});
+parser.addArgument(['-m', '--n-mul'], {
+    nargs: '?', help: 'MUL Workers', defaultValue: 1
+});
+parser.addArgument(['-d', '--n-div'], {
+    nargs: '?', help: 'DIV Workers', defaultValue: 1
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 
 var args = parser.parseArgs();
@@ -45,66 +58,70 @@ var system_service = new Service(url, Space.System.Service, {
 
 system_service.socket.on('open', function () {
 
-    var add_n = 1, add_interval_id = {};
-    var sub_n = 1, sub_interval_id = {};
-    var mul_n = 1, mul_interval_id = {};
-    var div_n = 1, div_interval_id = {};
+    var n_add = args.n_add, iid_add = {},
+        n_sub = args.n_sub, iid_sub = {},
+        n_mul = args.n_mul, iid_mul = {},
+        n_div = args.n_div, iid_div = {};
 
-    for (var add_i = 0; add_i < add_n; add_i++) {
-        add_interval_id[add_i] = setInterval(function () {
+    for (var add_i = 0; add_i < n_add; add_i++) {
+        iid_add[add_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
                 lhs: random(0, 256), rhs: random(0, 256)
             });
 
-            var t = process.hrtime();
+            t[i] = process.hrtime();
             system_service.api.add(pair, function (error, result) {
                 if (error !== null) throw error;
 
                 assert.equal(pair.lhs + pair.rhs, result.value);
-                console.log('dT[add]:', process.hrtime(t));
+                var dt = process.hrtime(t[i]); t[i] = process.hrtime();
+                console.log('dT[add]@%d:', i, dt[0]*1E3 + dt[1]/1E6);
+
             });
-        }, 0);
+        }).with(add_i, {}), 0);
     }
 
-    for (var sub_i = 0; sub_i < sub_n; sub_i++) {
-        sub_interval_id[sub_i] = setInterval(function () {
+    for (var sub_i = 0; sub_i < n_sub; sub_i++) {
+        iid_sub[sub_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
                 lhs: random(0, 256), rhs: random(0, 256)
             });
 
-            var t = process.hrtime();
+            t[i] = process.hrtime();
             system_service.api.sub(pair, function (error, result) {
                 if (error !== null) throw error;
 
                 assert.equal(pair.lhs - pair.rhs, result.value);
-                console.log('dT[sub]:', process.hrtime(t));
+                var dt = process.hrtime(t[i]); t[i] = process.hrtime();
+                console.log('dT[sub]@%d:', i, dt[0]*1E3 + dt[1]/1E6);
             });
-        }, 0);
+        }).with(sub_i, {}), 0);
     }
 
-    for (var mul_i = 0; mul_i < mul_n; mul_i++) {
-        mul_interval_id[mul_i] = setInterval(function () {
+    for (var mul_i = 0; mul_i < n_mul; mul_i++) {
+        iid_mul[mul_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
                 lhs: random(0, 256), rhs: random(0, 256)
             });
 
-            var t = process.hrtime();
+            t[i] = process.hrtime();
             system_service.api.mul(pair, function (error, result) {
                 if (error !== null) throw error;
 
                 assert.equal(pair.lhs * pair.rhs, result.value);
-                console.log('dT[mul]:', process.hrtime(t));
+                var dt = process.hrtime(t[i]); t[i] = process.hrtime();
+                console.log('dT[mul]@%d:', i, dt[0]*1E3 + dt[1]/1E6);
             });
-        }, 0);
+        }).with(mul_i, {}), 0);
     }
 
-    for (var div_i = 0; div_i < div_n; div_i++) {
-        div_interval_id[div_i] = setInterval(function () {
+    for (var div_i = 0; div_i < n_div; div_i++) {
+        iid_div[div_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
                 lhs: random(0, 256), rhs: random(0, 256)
             });
 
-            var t = process.hrtime();
+            t[i] = process.hrtime();
             system_service.api.div(pair, function (error, result) {
                 if (error !== null) throw error;
                 var q = pair.lhs / pair.rhs;
@@ -114,24 +131,25 @@ system_service.socket.on('open', function () {
                 assert.ok(isFinite(q) === false ||
                     Math.abs(q - result.value) < 1E6);
 
-                console.log('dT[div]:', process.hrtime(t));
+                var dt = process.hrtime(t[i]); t[i] = process.hrtime();
+                console.log('dT[div]@%d:', i, dt[0]*1E3 + dt[1]/1E6);
             });
-        }, 0);
+        }).with(div_i, {}), 0);
     }
 
     setTimeout(function () {
-        for (var add_key in add_interval_id)
-            if (add_interval_id.hasOwnProperty(add_key))
-                clearInterval(add_interval_id[add_key]);
-        for (var sub_key in sub_interval_id)
-            if (sub_interval_id.hasOwnProperty(sub_key))
-                clearInterval(sub_interval_id[sub_key]);
-        for (var mul_key in mul_interval_id)
-            if (mul_interval_id.hasOwnProperty(mul_key))
-                clearInterval(mul_interval_id[mul_key]);
-        for (var div_key in div_interval_id)
-            if (div_interval_id.hasOwnProperty(div_key))
-                clearInterval(div_interval_id[div_key]);
+        for (var key_add in iid_add)
+            if (iid_add.hasOwnProperty(key_add))
+                clearInterval(iid_add[key_add]);
+        for (var key_sub in iid_sub)
+            if (iid_sub.hasOwnProperty(key_sub))
+                clearInterval(iid_sub[key_sub]);
+        for (var key_mul in iid_mul)
+            if (iid_mul.hasOwnProperty(key_mul))
+                clearInterval(iid_mul[key_mul]);
+        for (var key_div in iid_div)
+            if (iid_div.hasOwnProperty(key_div))
+                clearInterval(iid_div[key_div]);
 
         system_service.socket.close();
     }, 10000);
@@ -139,6 +157,16 @@ system_service.socket.on('open', function () {
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+Function.prototype.with = function () {
+    var slice = Array.prototype.slice,
+        args = slice.call(arguments),
+        func = this;
+
+    return function () {
+        return func.apply(this, args.concat(slice.call(arguments)));
+    };
+};
 
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
