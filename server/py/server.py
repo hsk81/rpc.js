@@ -9,71 +9,87 @@ import tornado.ioloop
 ###############################################################################
 ###############################################################################
 
-from protocol import dizmo_space_pb2 as Dizmo
+from protocol import space_pb2 as Space
+from protocol import system_pb2 as System
 
 ###############################################################################
 ###############################################################################
 
-class WebSocketHandler (tornado.websocket.WebSocketHandler):
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
-    def on_message (self, data):
-        rpc_req = Dizmo.Rpc.Request()
-        rpc_req.ParseFromString(data)
-        pair = Dizmo.System.Pair()
-        pair.ParseFromString(rpc_req.data)
+    def on_message(self, data):
 
-        if rpc_req.name == '.SystemService.add':
-            result = Dizmo.System.AddResult()
+        req = Space.Rpc.Request()
+        req.ParseFromString(data)
+        pair = System.Pair()
+        pair.ParseFromString(req.data)
+
+        if req.name == '.System.Service.add':
+            result = System.AddResult()
             result.value = pair.lhs + pair.rhs
 
-        elif rpc_req.name == '.SystemService.sub':
-            result = Dizmo.System.SubResult()
+        elif req.name == '.System.Service.sub':
+            result = System.SubResult()
             result.value = pair.lhs - pair.rhs
 
-        elif rpc_req.name == '.SystemService.mul':
-            result = Dizmo.System.MulResult()
+        elif req.name == '.System.Service.mul':
+            result = System.MulResult()
             result.value = pair.lhs * pair.rhs
 
-        elif rpc_req.name == '.SystemService.div':
-            result = Dizmo.System.DivResult()
-            result.value = pair.lhs / pair.rhs
+        elif req.name == '.System.Service.div':
+            result = System.DivResult()
+
+            try:
+                result.value = pair.lhs / pair.rhs
+            except ZeroDivisionError as ex:
+
+                if pair.lhs > 0.0:
+                    result.value = float('+inf')
+                elif pair.lhs < 0.0:
+                    result.value = float('-inf')
+                else:
+                    result.value = float('nan')
+
+                print ex, ':', result.value
 
         else:
-            raise Exception('{0}: not suported'.format(rpc_req.name))
+            raise Exception('{0}: not supported'.format(req.name))
 
-        rpc_res = Dizmo.Rpc.Response()
-        rpc_res.id = rpc_req.id
-        rpc_req.data = result.SerializeToString()
+        res = Space.Rpc.Response()
+        res.data = result.SerializeToString()
+        res.id = req.id
 
-        self.write_message(rpc_req.SerializeToString(), binary=True)
+        self.write_message(res.SerializeToString(), binary=True)
 
-    def check_origin (self, origin):
+    def check_origin(self, origin):
+
         return True
 
 ###############################################################################
 
-application = tornado.web.Application ([(r'/', WebSocketHandler)])
+application = tornado.web.Application([(r'/', WebSocketHandler)])
 
 ###############################################################################
 ###############################################################################
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser (prog='RPC Server',
+    parser = argparse.ArgumentParser(prog='RPC Server',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s 0.0.1')
-    parser.add_argument ('port', metavar='PORT', type=int,
-        default=os.environ.get ('RPC_PORT', 8088), nargs='?',
+    parser.add_argument('port', metavar='PORT', type=int,
+        default=os.environ.get('RPC_PORT', 8088), nargs='?',
         help='Server Port')
-    parser.add_argument ('host', metavar='HOST', type=str,
-        default=os.environ.get ('RPC_HOST', 'localhost'), nargs='?',
+    parser.add_argument('host', metavar='HOST', type=str,
+        default=os.environ.get('RPC_HOST', 'localhost'),
+        nargs='?',
         help='Server Host')
 
-    args = parser.parse_args ()
-    application.listen (args.port, args.host)
-    tornado.ioloop.IOLoop.instance ().start ()
+    arguments = parser.parse_args()
+    application.listen(arguments.port, arguments.host)
+    tornado.ioloop.IOLoop.instance().start()
 
 ###############################################################################
 ###############################################################################

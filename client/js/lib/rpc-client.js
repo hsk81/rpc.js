@@ -5,7 +5,7 @@ var ArgumentParser = require('argparse').ArgumentParser,
     assert = require('assert'),
     now = require('performance-now');
 
-var DizmoSpace = require('./rpc.js').DizmoSpace,
+var Space = require('./rpc.js').Space,
     Service = require('./rpc.js').Service;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,42 +33,84 @@ var url = 'ws://' + args.host + ':' + args.port;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-var system_svc = new Service(url, DizmoSpace.SystemService, {
-    '.SystemService.add': DizmoSpace.System.AddResult,
-    '.SystemService.sub': DizmoSpace.System.SubResult,
-    '.SystemService.mul': DizmoSpace.System.MulResult,
-    '.SystemService.div': DizmoSpace.System.DivResult
+var system_service = new Service(url, Space.System.Service, {
+    '.System.Service.add': Space.System.AddResult,
+    '.System.Service.sub': Space.System.SubResult,
+    '.System.Service.mul': Space.System.MulResult,
+    '.System.Service.div': Space.System.DivResult
 });
 
 /////////////////////////////////////////////////////////////////////)/////////
 ///////////////////////////////////////////////////////////////////////////////
 
-system_svc.socket.on('open', function () {
-    var intervalId = setInterval(function () {
-        var pair = new DizmoSpace.System.Pair({
+system_service.socket.on('open', function () {
+
+    var intervalId0 = setInterval(function () {
+        var pair = new Space.System.Pair({
             lhs: random(0, 256), rhs: random(0, 256)
         });
 
         var t0 = now();
-        system_svc.api.add(pair, function (error, result) {
+        system_service.api.add(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs + pair.rhs, result.value);
-            console.log(now() - t0);
+            console.log('T0:', now() - t0);
+        });
+    }, 0);
+
+    var intervalId1 = setInterval(function () {
+        var pair = new Space.System.Pair({
+            lhs: random(0, 256), rhs: random(0, 256)
         });
 
         var t1 = now();
-        system_svc.api.sub(pair, function (error, result) {
+        system_service.api.sub(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs - pair.rhs, result.value);
-            console.log(now() - t1);
+            console.log('T1:', now() - t1);
+        });
+    }, 0);
+
+    var intervalId2 = setInterval(function () {
+        var pair = new Space.System.Pair({
+            lhs: random(0, 256), rhs: random(0, 256)
+        });
+
+        var t2 = now();
+        system_service.api.mul(pair, function (error, result) {
+            if (error !== null) throw error;
+
+            assert.equal(pair.lhs * pair.rhs, result.value);
+            console.log('T2:', now() - t2);
+        });
+    }, 0);
+
+    var intervalId3 = setInterval(function () {
+        var pair = new Space.System.Pair({
+            lhs: random(0, 256), rhs: random(0, 256)
+        });
+
+        var t3 = now();
+        system_service.api.div(pair, function (error, result) {
+            if (error !== null) throw error;
+
+            assert.ok(isNaN(pair.lhs / pair.rhs) === isNaN(result.value));
+            assert.ok(isFinite(pair.lhs/ pair.rhs) === isFinite(result.value));
+            assert.ok(isFinite(pair.lhs/ pair.rhs) === false ||
+                Math.abs(pair.lhs / pair.rhs - result.value) < 1E6);
+
+            console.log(now() - t3);
         });
     }, 0);
 
     setTimeout(function () {
-        clearInterval(intervalId);
-        system_svc.socket.close();
+        clearInterval(intervalId0);
+        clearInterval(intervalId1);
+        clearInterval(intervalId2);
+        clearInterval(intervalId3);
+        system_service.socket.close();
     }, 10000);
 });
 
