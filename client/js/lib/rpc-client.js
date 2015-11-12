@@ -57,6 +57,7 @@ var system_service = new Service(url, Space.System.Service, {
 ///////////////////////////////////////////////////////////////////////////////
 
 system_service.socket.on('open', function () {
+    console.log('=', new Date());
 
     var n_add = args.n_add, iid_add = {},
         n_sub = args.n_sub, iid_sub = {},
@@ -66,7 +67,7 @@ system_service.socket.on('open', function () {
     for (var add_i = 0; add_i < n_add; add_i++) {
         iid_add[add_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(1, 256), rhs: random(1, 256)
+                lhs: random(0, 255), rhs: random(0, 255)
             });
 
             t[i] = process.hrtime();
@@ -84,7 +85,7 @@ system_service.socket.on('open', function () {
     for (var sub_i = 0; sub_i < n_sub; sub_i++) {
         iid_sub[sub_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(1, 256), rhs: random(1, 256)
+                lhs: random(0, 255), rhs: random(0, 255)
             });
 
             t[i] = process.hrtime();
@@ -101,7 +102,7 @@ system_service.socket.on('open', function () {
     for (var mul_i = 0; mul_i < n_mul; mul_i++) {
         iid_mul[mul_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(1, 256), rhs: random(1, 256)
+                lhs: random(0, 255), rhs: random(0, 255)
             });
 
             t[i] = process.hrtime();
@@ -118,7 +119,7 @@ system_service.socket.on('open', function () {
     for (var div_i = 0; div_i < n_div; div_i++) {
         iid_div[div_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(1, 256), rhs: random(1, 256)
+                lhs: random(0, 255), rhs: random(1, 256)
             });
 
             t[i] = process.hrtime();
@@ -146,7 +147,8 @@ system_service.socket.on('open', function () {
             if (iid_div.hasOwnProperty(key_div))
                 clearInterval(iid_div[key_div]);
 
-        system_service.socket.close();
+        console.log('=', new Date());
+        process.exit();
     }, 10000);
 });
 
