@@ -50,8 +50,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 else:
                     result.value = float('nan')
 
-                print ex, ':', result.value
-
         else:
             raise Exception('{0}: not supported'.format(req.name))
 

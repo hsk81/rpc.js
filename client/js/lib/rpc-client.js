@@ -101,7 +101,7 @@ system_service.socket.on('open', function () {
             assert.ok(isFinite(pair.lhs/ pair.rhs) === false ||
                 Math.abs(pair.lhs / pair.rhs - result.value) < 1E6);
 
-            console.log(now() - t3);
+            console.log('T3:', now() - t3);
         });
     }, 0);
 
