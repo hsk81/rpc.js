@@ -38,17 +38,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
         elif req.name == '.System.Service.div':
             result = System.DivResult()
-
-            try:
-                result.value = pair.lhs / pair.rhs
-            except ZeroDivisionError as ex:
-
-                if pair.lhs > 0.0:
-                    result.value = float('+inf')
-                elif pair.lhs < 0.0:
-                    result.value = float('-inf')
-                else:
-                    result.value = float('nan')
+            result.value = pair.lhs / pair.rhs
 
         else:
             raise Exception('{0}: not supported'.format(req.name))

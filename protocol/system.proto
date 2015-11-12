@@ -9,21 +9,21 @@ package System;
 ///////////////////////////////////////////////////////////////////////////////
 
 message Pair {
-    float lhs = 1;
-    float rhs = 2;
+    int32 lhs = 1;
+    int32 rhs = 2;
 }
 
 message AddResult {
-    float value = 1;
+    int32 value = 1;
 }
 message SubResult {
-    float value = 1;
+    int32 value = 1;
 }
 message MulResult {
-    float value = 1;
+    int32 value = 1;
 }
 message DivResult {
-    float value = 1;
+    int32 value = 1;
 }
 
 service Service {

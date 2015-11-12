@@ -66,7 +66,7 @@ system_service.socket.on('open', function () {
     for (var add_i = 0; add_i < n_add; add_i++) {
         iid_add[add_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(0, 256), rhs: random(0, 256)
+                lhs: random(1, 256), rhs: random(1, 256)
             });
 
             t[i] = process.hrtime();
@@ -84,7 +84,7 @@ system_service.socket.on('open', function () {
     for (var sub_i = 0; sub_i < n_sub; sub_i++) {
         iid_sub[sub_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(0, 256), rhs: random(0, 256)
+                lhs: random(1, 256), rhs: random(1, 256)
             });
 
             t[i] = process.hrtime();
@@ -101,7 +101,7 @@ system_service.socket.on('open', function () {
     for (var mul_i = 0; mul_i < n_mul; mul_i++) {
         iid_mul[mul_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(0, 256), rhs: random(0, 256)
+                lhs: random(1, 256), rhs: random(1, 256)
             });
 
             t[i] = process.hrtime();
@@ -118,19 +118,14 @@ system_service.socket.on('open', function () {
     for (var div_i = 0; div_i < n_div; div_i++) {
         iid_div[div_i] = setInterval((function (i, t) {
             var pair = new Space.System.Pair({
-                lhs: random(0, 256), rhs: random(0, 256)
+                lhs: random(1, 256), rhs: random(1, 256)
             });
 
             t[i] = process.hrtime();
             system_service.api.div(pair, function (error, result) {
                 if (error !== null) throw error;
-                var q = pair.lhs / pair.rhs;
 
-                assert.ok(isNaN(q) === isNaN(result.value));
-                assert.ok(isFinite(q) === isFinite(result.value));
-                assert.ok(isFinite(q) === false ||
-                    Math.abs(q - result.value) < 1E6);
-
+                assert.equal(Math.floor(pair.lhs / pair.rhs), result.value);
                 var dt = process.hrtime(t[i]); t[i] = process.hrtime();
                 console.log('dT[div]@%d:', i, dt[0]*1E3 + dt[1]/1E6);
             });

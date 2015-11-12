@@ -66,9 +66,9 @@ wss.on('connection', function (ws) {
                 break;
 
             case '.System.Service.div':
-                result = new Space.System.DivResult({
-                    value: pair.lhs / pair.rhs
-                });
+                    result = new Space.System.DivResult({
+                        value: Math.floor(pair.lhs / pair.rhs)
+                    });
                 break;
 
             default:
