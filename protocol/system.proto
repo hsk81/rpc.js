@@ -3,34 +3,31 @@ syntax = "proto3";
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-package System;
+message System {
+    message Pair {
+        float lhs = 1;
+        float rhs = 2;
+    }
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-message Pair {
-    float lhs = 1;
-    float rhs = 2;
-}
-
-message AddResult {
-    float value = 1;
-}
-message SubResult {
-    float value = 1;
-}
-message MulResult {
-    float value = 1;
-}
-message DivResult {
-    float value = 1;
+    message AddResult {
+        float value = 1;
+    }
+    message SubResult {
+        float value = 1;
+    }
+    message MulResult {
+        float value = 1;
+    }
+    message DivResult {
+        float value = 1;
+    }
 }
 
-service Service {
-    rpc add(Pair) returns(AddResult);
-    rpc sub(Pair) returns(SubResult);
-    rpc mul(Pair) returns(MulResult);
-    rpc div(Pair) returns(DivResult);
+service SystemService {
+    rpc add(System.Pair) returns(System.AddResult);
+    rpc sub(System.Pair) returns(System.SubResult);
+    rpc mul(System.Pair) returns(System.MulResult);
+    rpc div(System.Pair) returns(System.DivResult);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

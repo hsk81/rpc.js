@@ -13,7 +13,7 @@ build-py: build-py.pb
 	cd py && virtualenv2 -p /usr/bin/python2 --system-site-packages env/
 	cd py && env/bin/python setup.py install
 build-py.pb:
-	cd py && protoc --python_out=./ protocol/*.proto
+	cd py && protoc -I./protocol --python_out=./protocol protocol/*.proto
 
 ###############################################################################
 ###############################################################################

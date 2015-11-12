@@ -9,25 +9,50 @@ import tornado.ioloop
 ###############################################################################
 ###############################################################################
 
-from protocol import core_pb2 as Core
+from protocol import dizmo_space_pb2 as Dizmo
 
 ###############################################################################
 ###############################################################################
 
-class WsEchoHandler (tornado.websocket.WebSocketHandler):
+class WebSocketHandler (tornado.websocket.WebSocketHandler):
 
     def on_message (self, data):
-        ts = Core.Timestamp(); ts.ParseFromString(data)
-        assert type (ts.value) == float
+        rpc_req = Dizmo.Rpc.Request()
+        rpc_req.ParseFromString(data)
+        pair = Dizmo.System.Pair()
+        pair.ParseFromString(rpc_req.data)
 
-        self.write_message(ts.SerializeToString(), binary=True)
+        if rpc_req.name == '.SystemService.add':
+            result = Dizmo.System.AddResult()
+            result.value = pair.lhs + pair.rhs
+
+        elif rpc_req.name == '.SystemService.sub':
+            result = Dizmo.System.SubResult()
+            result.value = pair.lhs - pair.rhs
+
+        elif rpc_req.name == '.SystemService.mul':
+            result = Dizmo.System.MulResult()
+            result.value = pair.lhs * pair.rhs
+
+        elif rpc_req.name == '.SystemService.div':
+            result = Dizmo.System.DivResult()
+            result.value = pair.lhs / pair.rhs
+
+        else:
+            raise Exception('{0}: not suported'.format(rpc_req.name))
+
+        rpc_res = Dizmo.Rpc.Response()
+        rpc_res.id = rpc_req.id
+        rpc_req.data = result.SerializeToString()
+
+        self.write_message(rpc_req.SerializeToString(), binary=True)
 
     def check_origin (self, origin):
         return True
 
 ###############################################################################
 
-application = tornado.web.Application ([(r'/', WsEchoHandler)])
+application = tornado.web.Application ([(r'/', WebSocketHandler)])
 
 ###############################################################################
 ###############################################################################

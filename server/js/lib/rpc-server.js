@@ -27,11 +27,11 @@ var args = parser.parseArgs();
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-var CoreFactory = ProtoBuf.loadProtoFile({
-    root: __dirname + '/../../../protocol', file: 'core.proto'
+var DizmoSpaceFactory = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../../../protocol', file: 'dizmo-space.proto'
 });
 
-var Core = CoreFactory.build();
+var DizmoSpace = DizmoSpaceFactory.build();
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,47 +41,44 @@ var wss = new WebSocket.Server({
 });
 
 wss.on('connection', function (ws) {
-    var pair, result;
-
     ws.on('message', function (data, opts) {
-        var service_req = Core.Service.Request.decode(data);
-        if (service_req.name === '.System.Service.add') {
-            pair = Core.System.Pair.decode(service_req.data);
-            result = new Core.System.AddResult({
+        var rpc_req = DizmoSpace.Rpc.Request.decode(data),
+            pair = DizmoSpace.System.Pair.decode(rpc_req.data),
+            result;
+
+        if (rpc_req.name === '.SystemService.add') {
+            result = new DizmoSpace.System.AddResult({
                 value: pair.lhs + pair.rhs
             });
         }
 
-        else if (service_req.name === '.System.Service.sub') {
-            pair = Core.System.Pair.decode(service_req.data);
-            result = new Core.System.SubResult({
+        else if (rpc_req.name === '.SystemService.sub') {
+            result = new DizmoSpace.System.SubResult({
                 value: pair.lhs - pair.rhs
             });
         }
 
-        else if (service_req.name === '.System.Service.mul') {
-            pair = Core.System.Pair.decode(service_req.data);
-            result = new Core.System.MulResult({
+        else if (rpc_req.name === '.SystemService.mul') {
+            result = new DizmoSpace.System.MulResult({
                 value: pair.lhs * pair.rhs
             });
         }
 
-        else if (service_req.name === '.System.Service.div') {
-            pair = Core.System.Pair.decode(service_req.data);
-            result = new Core.System.DivResult({
+        else if (rpc_req.name === '.SystemService.div') {
+            result = new DizmoSpace.System.DivResult({
                 value: pair.lhs / pair.rhs
             });
         }
 
         else {
-            throw(new Error(service_req.name + ': not suported'));
+            throw(new Error(rpc_req.name + ': not suported'));
         }
 
-        var service_res = new Core.Service.Response({
-            id: service_req.id, data: result.toBuffer()
+        var rpc_res = new DizmoSpace.Rpc.Response({
+            id: rpc_req.id, data: result.toBuffer()
         });
 
-        ws.send(service_res.toBuffer());
+        ws.send(rpc_res.toBuffer());
     });
 });
 

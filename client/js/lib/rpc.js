@@ -6,11 +6,11 @@ var ProtoBuf = require('protobufjs'),
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-var CoreFactory = ProtoBuf.loadProtoFile({
-    root: __dirname + '/../../../protocol', file: 'core.proto'
+var DizmoSpaceFactory = ProtoBuf.loadProtoFile({
+    root: __dirname + '/../../../protocol', file: 'dizmo-space.proto'
 });
 
-var Core = CoreFactory.build();
+var DizmoSpace = DizmoSpaceFactory.build();
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ var Service = mine(function (self, url, service_cls, result_cls) {
 
     self.socket = new WebSocket(url);
     self.socket.on('message', function (data) {
-        var service_res = Core.Service.Response.decode(data);
+        var service_res = DizmoSpace.Rpc.Response.decode(data);
         self._handler[service_res.id](service_res.data);
     });
 
@@ -33,7 +33,7 @@ var Service = mine(function (self, url, service_cls, result_cls) {
     };
 
     self.api = new service_cls(function (method, req, callback) {
-        var service_req = new Core.Service.Request({
+        var service_req = new DizmoSpace.Rpc.Request({
             name: method, id: nextId(), data: req.toBuffer()
         });
 
@@ -63,7 +63,7 @@ function mine (fn) {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-exports.Core = Core;
+exports.DizmoSpace = DizmoSpace;
 exports.Service = Service;
 
 ///////////////////////////////////////////////////////////////////////////////

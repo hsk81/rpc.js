@@ -3,11 +3,10 @@
 
 var ArgumentParser = require('argparse').ArgumentParser,
     assert = require('assert'),
-    now = require('performance-now'),
-    RPC = require('./rpc.js');
+    now = require('performance-now');
 
-var Core = RPC.Core,
-    Service = RPC.Service;
+var DizmoSpace = require('./rpc.js').DizmoSpace,
+    Service = require('./rpc.js').Service;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,24 +33,24 @@ var url = 'ws://' + args.host + ':' + args.port;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-var system = new Service(url, Core.System.Service, {
-    '.System.Service.add': Core.System.AddResult,
-    '.System.Service.sub': Core.System.SubResult,
-    '.System.Service.mul': Core.System.MulResult,
-    '.System.Service.div': Core.System.DivResult
+var system_svc = new Service(url, DizmoSpace.SystemService, {
+    '.SystemService.add': DizmoSpace.System.AddResult,
+    '.SystemService.sub': DizmoSpace.System.SubResult,
+    '.SystemService.mul': DizmoSpace.System.MulResult,
+    '.SystemService.div': DizmoSpace.System.DivResult
 });
 
 /////////////////////////////////////////////////////////////////////)/////////
 ///////////////////////////////////////////////////////////////////////////////
 
-system.socket.on('open', function () {
+system_svc.socket.on('open', function () {
     var intervalId = setInterval(function () {
-        var pair = new Core.System.Pair({
+        var pair = new DizmoSpace.System.Pair({
             lhs: random(0, 256), rhs: random(0, 256)
         });
 
         var t0 = now();
-        system.api.add(pair, function (error, result) {
+        system_svc.api.add(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs + pair.rhs, result.value);
@@ -59,7 +58,7 @@ system.socket.on('open', function () {
         });
 
         var t1 = now();
-        system.api.sub(pair, function (error, result) {
+        system_svc.api.sub(pair, function (error, result) {
             if (error !== null) throw error;
 
             assert.equal(pair.lhs - pair.rhs, result.value);
@@ -69,7 +68,7 @@ system.socket.on('open', function () {
 
     setTimeout(function () {
         clearInterval(intervalId);
-        system.socket.close();
+        system_svc.socket.close();
     }, 10000);
 });
 
